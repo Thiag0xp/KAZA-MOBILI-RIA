@@ -362,3 +362,68 @@ footer .brand img{width:42px;height:42px;border-radius:50%}
   .wa{bottom:84px!important}
   footer{padding-bottom:84px}
 }
+
+/* ==========================================================
+   v5.1 — menu móvel: botão à esquerda + gaveta que desliza da esquerda
+   ========================================================== */
+@media(max-width:900px){
+  /* o blur do cabeçalho prenderia a gaveta (position:fixed) dentro dele */
+  header,header.sc{background:rgba(10,26,51,.96);backdrop-filter:none;-webkit-backdrop-filter:none}
+  body.home header:not(.sc){background:transparent}
+  body.menu header{background:transparent;border-color:transparent;box-shadow:none}
+
+  header>.w{justify-content:flex-start;gap:14px}
+  #burger{order:-1;display:block;flex:none;width:46px;height:46px;border-radius:14px;
+    background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);
+    transition:background .3s,box-shadow .3s}
+  #burger span{left:13px;right:13px;transition:transform .45s var(--ease),top .45s var(--ease),opacity .25s,background .3s,left .45s var(--ease),right .45s var(--ease)}
+  #burger span:nth-child(1){top:16px}#burger span:nth-child(2){top:22px}#burger span:nth-child(3){top:28px}
+  /* três traços → "X" dourado */
+  body.menu #burger{background:rgba(201,162,74,.18);box-shadow:inset 0 0 0 1px rgba(232,207,138,.5)}
+  body.menu #burger span{background:var(--gold-2)}
+  body.menu #burger span:nth-child(1){top:22px;transform:rotate(45deg)}
+  body.menu #burger span:nth-child(2){opacity:0;left:23px;right:23px}
+  body.menu #burger span:nth-child(3){top:22px;transform:rotate(-45deg)}
+
+  /* película escura atrás da gaveta */
+  body::after{content:"";position:fixed;inset:0;z-index:90;background:rgba(3,9,22,.62);
+    backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+    opacity:0;visibility:hidden;transition:opacity .45s var(--ease),visibility .45s}
+  body.menu::after{opacity:1;visibility:visible}
+
+  /* gaveta */
+  body.home header nav,header nav{position:fixed;inset:0 auto 0 0;width:min(84vw,340px);height:100vh;height:100dvh;
+    flex-direction:column;justify-content:flex-start;align-items:stretch;gap:4px;
+    padding:96px 18px calc(28px + env(safe-area-inset-bottom));overflow-y:auto;
+    background:radial-gradient(420px 320px at 0% 0%,rgba(201,162,74,.14),transparent 70%),linear-gradient(180deg,#0b1d3a,#07122a);
+    border-right:1px solid rgba(232,207,138,.22);box-shadow:30px 0 70px rgba(0,0,0,.5);
+    transform:translateX(-104%);visibility:hidden;transition:transform .55s var(--ease),visibility .55s;z-index:110}
+  body.menu header nav{transform:none;visibility:visible}
+
+  header nav a:not(.btn){display:flex;align-items:center;justify-content:space-between;font-size:1.08rem;font-weight:600;
+    padding:14px 16px;border-radius:14px;color:#e6ecf8;text-align:left;
+    opacity:0;transform:translateX(-22px);transition:opacity .4s var(--ease),transform .5s var(--ease),background .25s,color .25s}
+  header nav a:not(.btn)::after{content:"";width:7px;height:7px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);opacity:.35}
+  header nav a.on:not(.btn){background:rgba(232,207,138,.12);color:var(--gold-2)}
+  header nav .btn{margin:auto 0 0;width:100%;min-height:54px;opacity:0;transform:translateX(-22px);transition:opacity .4s var(--ease) .5s,transform .5s var(--ease) .5s,box-shadow .35s}
+  body.menu header nav a:not(.btn),body.menu header nav .btn{opacity:1;transform:none}
+  /* entram um a um, "puxados" da esquerda */
+  body.menu header nav a:nth-child(1){transition-delay:.12s}
+  body.menu header nav a:nth-child(2){transition-delay:.17s}
+  body.menu header nav a:nth-child(3){transition-delay:.22s}
+  body.menu header nav a:nth-child(4){transition-delay:.27s}
+  body.menu header nav a:nth-child(5){transition-delay:.32s}
+  body.menu header nav a:nth-child(6){transition-delay:.37s}
+  body.menu header nav a:nth-child(7){transition-delay:.42s}
+
+  /* esconde o que ficaria por cima da gaveta */
+  body.menu .mbar{transform:translateY(110%)}
+  body.menu .wa,body.menu #up,body.menu #cookies{opacity:0;visibility:hidden}
+  .mbar{transition:transform .4s var(--ease)}
+
+  /* páginas internas (termos, 404) mantêm o menu em linha */
+  body:not(.home) header nav{position:static;inset:auto;width:auto;height:auto;flex-direction:row;padding:0;background:none;border:0;box-shadow:none;transform:none;visibility:visible;overflow:visible}
+  body:not(.home) header nav a:not(.btn){opacity:1;transform:none;display:inline-flex;justify-content:flex-start;font-size:.88rem;padding:9px 14px}
+  body:not(.home) header nav a:not(.btn)::after{display:none}
+  body:not(.home) header nav .btn{width:auto;margin:0 0 0 10px;opacity:1;transform:none;min-height:42px}
+}

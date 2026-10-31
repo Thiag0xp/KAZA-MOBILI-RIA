@@ -2,7 +2,12 @@ const $=(s,e=document)=>e.querySelector(s),$$=(s,e=document)=>[...e.querySelecto
 $$('.yr').forEach(e=>e.textContent=new Date().getFullYear());
 const hd=$('header');if(hd){const f=()=>hd.classList.toggle('sc',scrollY>40);addEventListener('scroll',f,{passive:true});f()}
 const bg=$('#burger');if(bg){bg.onclick=()=>{const o=document.body.classList.toggle('menu');bg.setAttribute('aria-expanded',o);bg.setAttribute('aria-label',o?'Fechar menu':'Abrir menu')}}
-$$('nav a').forEach(a=>a.addEventListener('click',()=>document.body.classList.remove('menu')));
+const closeMenu=()=>{document.body.classList.remove('menu');if(bg){bg.setAttribute('aria-expanded',false);bg.setAttribute('aria-label','Abrir menu')}};
+$$('nav a').forEach(a=>a.addEventListener('click',closeMenu));
+// fecha ao tocar fora da gaveta ou com Esc
+document.addEventListener('click',e=>{if(e.target===document.body&&document.body.classList.contains('menu'))closeMenu()});
+addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
+addEventListener('resize',()=>{if(innerWidth>900)closeMenu()});
 // animações ao fazer scroll
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
 $$('.rv').forEach((e,i)=>{e.style.transitionDelay=(i%4)*90+'ms';io.observe(e)});
