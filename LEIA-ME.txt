@@ -1,0 +1,31 @@
+KAZA MOBILIÁRIA — como correr e hospedar
+=========================================
+Requisitos: Node.js 18 ou mais recente (sem dependências externas).
+
+NO SEU PC
+  npm start
+  Site:   http://localhost:3000
+  Painel: http://localhost:3000/painel/
+  Login:  definido no ficheiro .env (PAINEL_USER / PAINEL_PASS)
+
+ESTRUTURA
+  server.js          arranque do servidor
+  src/config.js      configuração e leitura do .env
+  src/api.js         roteador da API (CSRF + autenticação)
+  src/routes/        public (formulários), auth (login), admin (painel)
+  src/auth.js        credenciais e sessões
+  src/storage.js     tickets.json e fotos
+  src/static.js      serve o site e o painel
+  public/            o site (HTML, CSS, JS, imagens)
+  painel/            o painel de pedidos
+  dados/             tickets, fotos e logs (criada sozinha; não vai para o Git)
+
+HOSPEDAGEM (Render, Railway, VPS...)
+  Build: npm i      Start: npm start
+  Variáveis: PAINEL_USER, PAINEL_PASS (frase longa), HTTPS=1, TRUST_PROXY=1
+  A pasta "dados/" tem de ficar num disco PERSISTENTE, senão os tickets
+  perdem-se a cada reinício.
+
+ANTES DE PUBLICAR
+  - Trocar a senha do painel por uma frase longa e única.
+  - Preencher os campos a amarelo em public/termos.html (NIF, morada, email...).

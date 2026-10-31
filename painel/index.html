@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#0a1a33">
+  <title>Painel | Kaza Mobiliária</title>
+  <link rel="icon" href="/img/logo.png">
+  <link rel="stylesheet" href="painel.css">
+</head>
+<body>
+
+  <!-- Login -->
+  <main id="login" class="login">
+    <form id="login-form" class="login__card" autocomplete="on">
+      <img src="/img/logo.png" alt="" width="72" height="72" class="login__logo">
+      <h1>Painel Kaza</h1>
+      <p class="login__sub">Entre para ver os pedidos de orçamento e candidaturas.</p>
+      <label class="field">
+        <span>Usuário</span>
+        <input id="login-user" autocomplete="username" required autofocus>
+      </label>
+      <label class="field">
+        <span>Senha</span>
+        <input id="login-pass" type="password" autocomplete="current-password" required>
+      </label>
+      <button class="btn btn--gold" type="submit">Entrar</button>
+      <p id="login-error" class="login__error" role="alert"></p>
+    </form>
+  </main>
+
+  <!-- Aplicação -->
+  <div id="app" class="app" hidden>
+    <aside class="side">
+      <div class="side__brand">
+        <img src="/img/logo.png" alt="" width="40" height="40">
+        <div><strong>Kaza</strong><small>Painel de pedidos</small></div>
+      </div>
+
+      <nav id="estado-nav" class="side__nav" aria-label="Filtrar por estado"></nav>
+
+      <div class="side__foot">
+        <button class="side__link" id="btn-logs" type="button">Registos do sistema</button>
+        <a class="side__link" href="/" target="_blank" rel="noopener">Ver o site</a>
+        <button class="side__link" id="btn-logout" type="button">Sair</button>
+      </div>
+    </aside>
+
+    <section class="main">
+      <header class="top">
+        <div class="top__title">
+          <h1 id="view-title">Todos os pedidos</h1>
+          <p id="view-count" class="muted"></p>
+        </div>
+        <button class="btn btn--ghost" id="btn-refresh" type="button">Atualizar</button>
+      </header>
+
+      <div class="tools">
+        <label class="search">
+          <span class="sr-only">Pesquisar</span>
+          <input id="search" type="search" placeholder="Pesquisar por nome, telefone ou número do ticket">
+        </label>
+        <div class="seg" id="tipo-seg" role="group" aria-label="Tipo de pedido">
+          <button type="button" data-tipo="" aria-pressed="true">Todos</button>
+          <button type="button" data-tipo="orcamento" aria-pressed="false">Orçamentos</button>
+          <button type="button" data-tipo="candidatura" aria-pressed="false">Candidaturas</button>
+        </div>
+      </div>
+
+      <ul id="list" class="list"></ul>
+    </section>
+
+    <!-- Detalhe do ticket -->
+    <div id="drawer-backdrop" class="backdrop" hidden></div>
+    <aside id="drawer" class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" hidden>
+      <button class="drawer__close" id="drawer-close" type="button" aria-label="Fechar">×</button>
+      <div id="drawer-body"></div>
+    </aside>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="painel.js"></script>
+</body>
+</html>

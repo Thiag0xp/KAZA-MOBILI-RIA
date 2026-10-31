@@ -1,0 +1,12 @@
+{
+  "name": "kaza-mobiliaria",
+  "version": "3.0.0",
+  "description": "Site da Kaza Mobiliária + painel de tickets (sem dependências)",
+  "main": "server.js",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": { "node": ">=18" },
+  "license": "UNLICENSED"
+}
