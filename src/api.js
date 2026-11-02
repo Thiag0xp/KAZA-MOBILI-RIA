@@ -18,14 +18,18 @@ function csrfOk(req, res) {
   return true;
 }
 
+const DONO = ['dono'];
+
 const ROUTES = {
   'POST /api/ticket': { handler: pub.createTicket },
   'POST /api/login': { handler: authRoutes.login },
   'POST /api/logout': { handler: authRoutes.logout, protected: true },
+  'GET /api/eu': { handler: authRoutes.whoami, protected: true },
   'GET /api/tickets': { handler: admin.listTickets, protected: true },
-  'GET /api/logs': { handler: admin.listLogs, protected: true },
   'POST /api/estado': { handler: admin.setState, protected: true },
-  'POST /api/apagar': { handler: admin.remove, protected: true },
+  // só o dono:
+  'GET /api/logs': { handler: admin.listLogs, protected: true, roles: DONO },
+  'POST /api/apagar': { handler: admin.remove, protected: true, roles: DONO },
 };
 
 async function handleApi(req, res, pathname) {
@@ -34,11 +38,19 @@ async function handleApi(req, res, pathname) {
   const route = ROUTES[`${req.method} ${pathname}`];
   const isPublic = route && !route.protected;
 
-  if (!isPublic && !auth.isAuthed(req)) {
-    log('ACESSO NEGADO ' + pathname, req);
-    return json(res, 401, { erro: 'Não autorizado' });
+  let session = null;
+  if (!isPublic) {
+    session = auth.getSession(req);
+    if (!session) {
+      log('ACESSO NEGADO ' + pathname, req);
+      return json(res, 401, { erro: 'Não autorizado' });
+    }
+    if (route?.roles && !route.roles.includes(session.role)) {
+      log(`ACESSO NEGADO ${pathname} (${session.user} é ${session.role})`, req);
+      return json(res, 403, { erro: 'Esta ação é só para o dono.' });
+    }
   }
-  if (route) return route.handler(req, res);
+  if (route) return route.handler(req, res, session);
   if (req.method === 'GET' && admin.photo(req, res, pathname)) return;
   return json(res, 404, { erro: 'Não encontrado' });
 }

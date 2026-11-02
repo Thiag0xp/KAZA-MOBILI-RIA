@@ -209,3 +209,10 @@ input:focus, select:focus, textarea:focus { outline: 0; border-color: var(--gold
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* utilizador atual */
+.who{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r-sm);background:rgba(255,255,255,.06)}
+.who__avatar{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--gold);color:var(--navy);font-weight:800;text-transform:uppercase}
+.who strong{display:block;color:#fff;font-size:.92rem;line-height:1.2}
+.who small{color:#8fa0c0;font-size:.76rem}
+.who small.dono{color:var(--gold)}

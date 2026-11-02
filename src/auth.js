@@ -1,5 +1,5 @@
 'use strict';
-// Credenciais e sessões do painel.
+// Credenciais, papéis (dono / auxiliar) e sessões do painel.
 const crypto = require('crypto');
 const fs = require('fs');
 const cfg = require('./config');
@@ -7,47 +7,58 @@ const { log } = require('./util');
 
 const sha = (s) => crypto.createHash('sha256').update(String(s)).digest();
 
-function resolvePassword() {
-  const configured = cfg.PAINEL_PASS;
-  if (configured) {
-    if (configured.length < cfg.MIN_PASS_PRODUCAO && cfg.HTTPS) {
-      log(`AVISO: PAINEL_PASS tem menos de ${cfg.MIN_PASS_PRODUCAO} caracteres e o site está em HTTPS. Use uma frase longa.`);
+function loadUsers() {
+  const users = cfg.USERS.map((u) => ({ ...u, hUser: sha(u.user), hPass: sha(u.pass) }));
+
+  // Sem senha do dono no .env: gera uma forte no 1.º arranque.
+  if (!users.some((u) => u.role === 'dono')) {
+    let pass;
+    if (fs.existsSync(cfg.file.senhaGerada)) pass = fs.readFileSync(cfg.file.senhaGerada, 'utf8').trim();
+    else {
+      pass = crypto.randomBytes(12).toString('base64url');
+      fs.writeFileSync(cfg.file.senhaGerada, pass, { mode: 0o600 });
+      console.log(`\n⚠ Senha do dono não definida. Gerada para "${cfg.DONO_USER_PADRAO}": ${pass}\n  (guardada em dados/.painel-pass)\n`);
     }
-    return configured;
+    users.push({ user: cfg.DONO_USER_PADRAO, pass, role: 'dono', hUser: sha(cfg.DONO_USER_PADRAO), hPass: sha(pass) });
   }
-  // Sem PAINEL_PASS: gera uma senha forte no 1.º arranque.
-  if (fs.existsSync(cfg.file.senhaGerada)) return fs.readFileSync(cfg.file.senhaGerada, 'utf8').trim();
-  const pass = crypto.randomBytes(12).toString('base64url');
-  fs.writeFileSync(cfg.file.senhaGerada, pass, { mode: 0o600 });
-  console.log(`\n⚠ PAINEL_PASS não definida. Senha gerada para "${cfg.PAINEL_USER}": ${pass}\n  (guardada em dados/.painel-pass)\n`);
-  return pass;
+
+  if (cfg.HTTPS) {
+    users.filter((u) => u.pass.length < cfg.MIN_PASS_PRODUCAO)
+      .forEach((u) => log(`AVISO: a senha de "${u.user}" tem menos de ${cfg.MIN_PASS_PRODUCAO} caracteres. Use uma frase longa.`));
+  }
+  return users;
 }
 
-const PASS = resolvePassword();
+const USERS = loadUsers();
 
-/** Comparação em tempo constante. */
-const checkLogin = (user, pass) => {
-  const a = crypto.timingSafeEqual(sha(user), sha(cfg.PAINEL_USER));
-  const b = crypto.timingSafeEqual(sha(pass), sha(PASS));
-  return a && b;
-};
+/** Devolve o utilizador se as credenciais estiverem certas (tempo constante, sem curto-circuito). */
+function checkLogin(user, pass) {
+  const hu = sha(user), hp = sha(pass);
+  let found = null;
+  for (const u of USERS) {
+    const ok = crypto.timingSafeEqual(hu, u.hUser) & crypto.timingSafeEqual(hp, u.hPass);
+    if (ok) found = u;
+  }
+  return found;
+}
 
 const sessions = new Map();
 
 const parseCookies = (req) =>
   Object.fromEntries((req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((a) => a[0]));
 
-const isAuthed = (req) => {
+/** Sessão válida do pedido ({ user, role }) ou null. */
+function getSession(req) {
   const t = parseCookies(req).kz;
-  const exp = t && sessions.get(t);
-  return !!exp && exp > Date.now();
-};
+  const s = t && sessions.get(t);
+  return s && s.exp > Date.now() ? s : null;
+}
 
 const cookieFlags = () => `HttpOnly; SameSite=Strict; Path=/${cfg.HTTPS ? '; Secure' : ''}`;
 
-function createSession() {
+function createSession(u) {
   const token = crypto.randomBytes(32).toString('hex');
-  sessions.set(token, Date.now() + cfg.SESSION_MS);
+  sessions.set(token, { exp: Date.now() + cfg.SESSION_MS, user: u.user, role: u.role });
   return `kz=${token}; ${cookieFlags()}; Max-Age=${cfg.SESSION_MS / 1000}`;
 }
 
@@ -56,6 +67,6 @@ function destroySession(req) {
   return `kz=; ${cookieFlags()}; Max-Age=0`;
 }
 
-const purgeSessions = () => { const n = Date.now(); for (const [k, e] of sessions) if (n > e) sessions.delete(k); };
+const purgeSessions = () => { const n = Date.now(); for (const [k, s] of sessions) if (n > s.exp) sessions.delete(k); };
 
-module.exports = { checkLogin, isAuthed, createSession, destroySession, purgeSessions };
+module.exports = { checkLogin, getSession, createSession, destroySession, purgeSessions };

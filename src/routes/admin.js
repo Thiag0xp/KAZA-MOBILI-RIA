@@ -13,28 +13,28 @@ const listLogs = (req, res) => {
   return json(res, 200, { logs: lines.slice(-300).reverse() });
 };
 
-async function setState(req, res) {
+async function setState(req, res, session) {
   const b = await readJson(req, 5e3);
   const all = store.readTickets();
   const t = all.find((i) => i.id === b.id);
   if (!t) return json(res, 404, { erro: 'Ticket não existe' });
   if (!cfg.ESTADOS.includes(b.estado)) return json(res, 400, { erro: 'Estado inválido' });
   t.estado = b.estado;
-  t.historico.push({ em: new Date().toISOString(), acao: `Estado: ${b.estado}` + (b.nota ? ` — ${clean(b.nota, 300)}` : '') });
+  t.historico.push({ em: new Date().toISOString(), acao: `Estado: ${b.estado}` + (b.nota ? ` — ${clean(b.nota, 300)}` : ''), por: session.user });
   store.writeTickets(all);
-  log(`ESTADO ${t.id} -> ${b.estado}`, req);
+  log(`ESTADO ${t.id} -> ${b.estado} (por ${session.user})`, req);
   return json(res, 200, t);
 }
 
 /** Direito ao apagamento (RGPD). */
-async function remove(req, res) {
+async function remove(req, res, session) {
   const b = await readJson(req, 2e3);
   const all = store.readTickets();
   const t = all.find((i) => i.id === b.id);
   if (!t) return json(res, 404, { erro: 'Ticket não existe' });
   t.fotos.forEach((f) => store.removePhoto(f.ficheiro));
   store.writeTickets(all.filter((i) => i !== t));
-  log(`APAGADO ${t.id}`, req);
+  log(`APAGADO ${t.id} (por ${session.user})`, req);
   return json(res, 200, { ok: 1 });
 }
 

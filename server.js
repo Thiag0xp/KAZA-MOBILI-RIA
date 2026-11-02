@@ -27,6 +27,9 @@ const server = http.createServer(async (req, res) => {
 
 server.requestTimeout = 30000;
 server.headersTimeout = 10000;
+server.keepAliveTimeout = 5000;
+server.maxHeadersCount = 60;
+server.maxRequestsPerSocket = 200;
 
 setInterval(() => { purgeLimits(); auth.purgeSessions(); }, 60000).unref();
 process.on('uncaughtException', (e) => log('FATAL ' + e.stack));

@@ -10,8 +10,13 @@ const SECURITY = {
   'Permissions-Policy': 'camera=(),microphone=(),geolocation=(),payment=()',
   'Cross-Origin-Opener-Policy': 'same-origin',
   'Cross-Origin-Resource-Policy': 'same-origin',
+  'X-Permitted-Cross-Domain-Policies': 'none',
+  'X-DNS-Prefetch-Control': 'off',
 };
-if (cfg.HTTPS) SECURITY['Strict-Transport-Security'] = 'max-age=63072000; includeSubDomains';
+if (cfg.HTTPS) {
+  SECURITY['Strict-Transport-Security'] = 'max-age=63072000; includeSubDomains';
+  SECURITY['Content-Security-Policy'] += '; upgrade-insecure-requests';
+}
 
 const MIME = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8',

@@ -56,7 +56,8 @@ function toast(msg, isError = false) {
 }
 
 // ---------- estado da interface ----------
-const state = { tickets: [], estado: '', tipo: '', busca: '' };
+const state = { tickets: [], estado: '', tipo: '', busca: '', eu: null };
+const isDono = () => state.eu && state.eu.role === 'dono';
 
 const filtered = () => {
   const q = state.busca.toLowerCase();
@@ -72,8 +73,10 @@ function showApp() { $('#login').hidden = true; $('#app').hidden = false; }
 
 async function load() {
   try {
+    state.eu = await api('/api/eu');
     state.tickets = await api('/api/tickets');
     showApp();
+    renderWho();
     render();
   } catch { showLogin(); }
 }
@@ -91,6 +94,14 @@ $('#login-form').addEventListener('submit', async (e) => {
 
 $('#btn-logout').addEventListener('click', async () => { await api('/api/logout', {}).catch(() => {}); closeDrawer(); load(); });
 $('#btn-refresh').addEventListener('click', async () => { await load(); toast('Lista atualizada'); });
+
+function renderWho() {
+  const box = $('#who');
+  const { user, role } = state.eu;
+  box.hidden = false;
+  box.innerHTML = `<span class="who__avatar">${esc(user.charAt(0))}</span><div><strong>${esc(user)}</strong><small class="${esc(role)}">${role === 'dono' ? 'Dono · acesso total' : 'Auxiliar'}</small></div>`;
+  $('#btn-logs').hidden = !isDono(); // registos do sistema: só o dono
+}
 
 // ---------- navegação e filtros ----------
 function renderNav() {
@@ -229,12 +240,12 @@ function openTicket(id) {
     </section>
     <section class="group">
       <h3>Histórico</h3>
-      <ul class="timeline">${[...t.historico].reverse().map((h) => `<li><time>${esc(fmtDate(h.em))}</time>${esc(h.acao)}</li>`).join('')}</ul>
+      <ul class="timeline">${[...t.historico].reverse().map((h) => `<li><time>${esc(fmtDate(h.em))}${h.por ? ' · ' + esc(h.por) : ''}</time>${esc(h.acao)}</li>`).join('')}</ul>
     </section>
-    <div class="danger-zone">
+    ${isDono() ? `<div class="danger-zone">
       <p>Apaga o pedido e todos os ficheiros. Não dá para desfazer.</p>
       <button class="btn btn--danger" id="apagar" type="button">Apagar pedido (RGPD)</button>
-    </div>`;
+    </div>` : ''}`;
 
   openDrawer(html);
   $$('.swatch[data-cor]').forEach((el) => { if (/^#[0-9a-f]{6}$/i.test(el.dataset.cor)) el.style.background = el.dataset.cor; });
@@ -248,7 +259,7 @@ function openTicket(id) {
     } catch (x) { handleError(x); }
   });
 
-  $('#apagar').addEventListener('click', async () => {
+  $('#apagar')?.addEventListener('click', async () => {
     if (!confirm(`Apagar ${id} e todos os ficheiros? Não dá para desfazer.`)) return;
     try {
       await api('/api/apagar', { id });

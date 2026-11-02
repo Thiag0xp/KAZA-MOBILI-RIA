@@ -16,12 +16,19 @@ try {
 
 const env = process.env;
 
+// Utilizadores do painel. "dono" pode tudo; "auxiliar" vê pedidos e atualiza estados,
+// mas não apaga pedidos nem vê os registos do sistema.
+const USERS = [];
+const addUser = (user, pass, role) => { if (user && pass) USERS.push({ user, pass, role }); };
+addUser(env.DONO_USER || env.PAINEL_USER, env.DONO_PASS || env.PAINEL_PASS, 'dono');
+addUser(env.AUX_USER, env.AUX_PASS, 'auxiliar');
+
 module.exports = {
   PORT: Number(env.PORT) || 3000,
   HTTPS: env.HTTPS === '1',
   TRUST_PROXY: env.TRUST_PROXY === '1',
-  PAINEL_USER: env.PAINEL_USER || 'kaza',
-  PAINEL_PASS: env.PAINEL_PASS || '',
+  USERS,
+  DONO_USER_PADRAO: env.DONO_USER || env.PAINEL_USER || 'dono',
   MIN_PASS_PRODUCAO: 10,
   SESSION_MS: 8 * 3600 * 1000,
   LOGIN_MAX: 8,

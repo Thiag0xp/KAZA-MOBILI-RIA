@@ -6,7 +6,10 @@ NO SEU PC
   npm start
   Site:   http://localhost:3000
   Painel: http://localhost:3000/painel/
-  Login:  definido no ficheiro .env (PAINEL_USER / PAINEL_PASS)
+  Login:  definido no ficheiro .env
+          dono      (DONO_USER / DONO_PASS)  -> acesso total
+          auxiliar  (AUX_USER / AUX_PASS)    -> vê pedidos e atualiza estados;
+                                                não apaga nem vê os registos
 
 ESTRUTURA
   server.js          arranque do servidor
@@ -16,16 +19,16 @@ ESTRUTURA
   src/auth.js        credenciais e sessões
   src/storage.js     tickets.json e fotos
   src/static.js      serve o site e o painel
-  public/            o site (HTML, CSS, JS, imagens)
+  public/            o site (index.html, trabalhe.html, termos.html, CSS, JS, imagens)
   painel/            o painel de pedidos
   dados/             tickets, fotos e logs (criada sozinha; não vai para o Git)
 
 HOSPEDAGEM (Render, Railway, VPS...)
   Build: npm i      Start: npm start
-  Variáveis: PAINEL_USER, PAINEL_PASS (frase longa), HTTPS=1, TRUST_PROXY=1
+  Variáveis: DONO_USER, DONO_PASS, AUX_USER, AUX_PASS, HTTPS=1, TRUST_PROXY=1
   A pasta "dados/" tem de ficar num disco PERSISTENTE, senão os tickets
   perdem-se a cada reinício.
 
 ANTES DE PUBLICAR
-  - Trocar a senha do painel por uma frase longa e única.
+  - Guardar as senhas do .env em local seguro (nunca partilhar o .env).
   - Preencher os campos a amarelo em public/termos.html (NIF, morada, email...).
