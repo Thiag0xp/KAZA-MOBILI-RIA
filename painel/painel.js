@@ -72,6 +72,7 @@ function showLogin() { $('#login').hidden = false; $('#app').hidden = true; }
 function showApp() { $('#login').hidden = true; $('#app').hidden = false; }
 
 async function load() {
+  if (!state.tickets.length && !$('#app').hidden) $('#list').innerHTML = '<li class="skeleton"></li>'.repeat(4);
   try {
     state.eu = await api('/api/eu');
     state.tickets = await api('/api/tickets');
@@ -93,7 +94,16 @@ $('#login-form').addEventListener('submit', async (e) => {
 });
 
 $('#btn-logout').addEventListener('click', async () => { await api('/api/logout', {}).catch(() => {}); closeDrawer(); load(); });
-$('#btn-refresh').addEventListener('click', async () => { await load(); toast('Lista atualizada'); });
+const refresh = async () => { await load(); toast('Lista atualizada'); };
+$('#btn-refresh').addEventListener('click', refresh);
+$('#btn-refresh-m').addEventListener('click', refresh);
+
+// menu lateral (telemóvel)
+const setNav = (open) => { document.body.classList.toggle('nav-open', open); $('#btn-menu').setAttribute('aria-expanded', open); };
+$('#btn-menu').addEventListener('click', () => setNav(!document.body.classList.contains('nav-open')));
+document.addEventListener('click', (e) => { if (document.body.classList.contains('nav-open') && !e.target.closest('#side, #btn-menu')) setNav(false); });
+$('#side').addEventListener('click', (e) => { if (e.target.closest('.nav-item, .side__link')) setNav(false); });
+matchMedia('(min-width: 881px)').addEventListener('change', () => setNav(false));
 
 function renderWho() {
   const box = $('#who');
@@ -144,8 +154,15 @@ function rowHtml(t) {
     </li>`;
 }
 
+function renderStats() {
+  const n = (e) => state.tickets.filter((t) => t.estado === e).length;
+  $('#stats').innerHTML = [['novo', 'Novos'], ['em contacto', 'Em contacto'], ['orçamentado', 'Orçamentados'], ['fechado', 'Fechados']]
+    .map(([e, r]) => `<div class="stat" data-estado="${esc(e)}"><b>${n(e)}</b><span>${esc(r)}</span></div>`).join('');
+}
+
 function render() {
   renderNav();
+  renderStats();
   const list = filtered();
   const titulo = state.estado ? cap(state.estado) : 'Todos os pedidos';
   $('#view-title').textContent = titulo;
@@ -170,18 +187,20 @@ function openDrawer(html) {
   $('#drawer-body').innerHTML = html;
   $('#drawer').hidden = false;
   $('#drawer-backdrop').hidden = false;
+  document.body.classList.add('lock');
   $('#drawer-close').focus();
 }
 
 function closeDrawer() {
   $('#drawer').hidden = true;
   $('#drawer-backdrop').hidden = true;
+  document.body.classList.remove('lock');
   if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
 }
 
 $('#drawer-close').addEventListener('click', closeDrawer);
 $('#drawer-backdrop').addEventListener('click', closeDrawer);
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#drawer').hidden) closeDrawer(); });
+document.addEventListener('keydown', (e) => { if (e.key !== 'Escape') return; if (!$('#drawer').hidden) closeDrawer(); else setNav(false); });
 
 function groupHtml(ticket, grupo) {
   const dados = ticket.dados;
@@ -223,7 +242,7 @@ function openTicket(id) {
     </div>
     <div class="contacts">
       <a href="tel:${esc(d.telefone)}">Ligar ${esc(d.telefone)}</a>
-      <a href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>
+      <a class="wa" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>
       ${d.email ? `<a href="mailto:${esc(d.email)}">${esc(d.email)}</a>` : ''}
     </div>
     ${GRUPOS.map((g) => groupHtml(t, g)).join('')}

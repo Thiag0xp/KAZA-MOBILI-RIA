@@ -2,7 +2,7 @@
 <html lang="pt-PT">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow">
   <meta name="theme-color" content="#0a1a33">
   <title>Painel | Kaza Mobiliária</title>
@@ -19,7 +19,7 @@
       <p class="login__sub">Entre para ver os pedidos de orçamento e candidaturas.</p>
       <label class="field">
         <span>Usuário</span>
-        <input id="login-user" autocomplete="username" required autofocus>
+        <input id="login-user" autocomplete="username" autocapitalize="none" spellcheck="false" required autofocus>
       </label>
       <label class="field">
         <span>Senha</span>
@@ -32,7 +32,12 @@
 
   <!-- Aplicação -->
   <div id="app" class="app" hidden>
-    <aside class="side">
+    <header class="topbar">
+      <button class="icon-btn" id="btn-menu" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="side">☰</button>
+      <strong>Painel Kaza</strong>
+      <button class="icon-btn" id="btn-refresh-m" type="button" aria-label="Atualizar">↻</button>
+    </header>
+    <aside class="side" id="side">
       <div class="side__brand">
         <img src="/img/logo.png" alt="" width="40" height="40">
         <div><strong>Kaza</strong><small>Painel de pedidos</small></div>
@@ -58,10 +63,12 @@
         <button class="btn btn--ghost" id="btn-refresh" type="button">Atualizar</button>
       </header>
 
+      <div id="stats" class="stats" aria-label="Resumo"></div>
+
       <div class="tools">
         <label class="search">
           <span class="sr-only">Pesquisar</span>
-          <input id="search" type="search" placeholder="Pesquisar por nome, telefone ou número do ticket">
+          <input id="search" type="search" placeholder="Pesquisar por nome, telefone ou ticket" enterkeyhint="search" autocomplete="off">
         </label>
         <div class="seg" id="tipo-seg" role="group" aria-label="Tipo de pedido">
           <button type="button" data-tipo="" aria-pressed="true">Todos</button>
@@ -70,7 +77,7 @@
         </div>
       </div>
 
-      <ul id="list" class="list"></ul>
+      <ul id="list" class="list" aria-live="polite"></ul>
     </section>
 
     <!-- Detalhe do ticket -->

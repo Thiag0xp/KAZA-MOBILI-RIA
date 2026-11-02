@@ -68,41 +68,6 @@ links.forEach(l=>{const s=$(l.getAttribute('href'));s&&so.observe(s)});
 $$('.sw').forEach(b=>b.onclick=()=>{const f=$('form[data-tipo=orcamento]');if(!f)return;f.elements.cor_principal.value=b.dataset.c;const d=f.elements.cores_descricao,l=d.value?d.value.split(', '):[];if(!l.includes(b.dataset.nome))l.push(b.dataset.nome);d.value=l.join(', ');
  toast(`✔ “${b.dataset.nome}” adicionado ao seu pedido`);setTimeout(()=>$('#orcamento').scrollIntoView({behavior:'smooth'}),800)});
 
-// ===== v6: desenhador de cozinha =====
-(()=>{
- const view=$('#cfg-view');if(!view)return;
- const woods=$$('.wd').map(w=>({nome:$('h3',w).textContent,img:$('img',w).getAttribute('src')}));
- const cores=$$('.sw').map(s=>({nome:s.dataset.nome,curto:$('span',s).textContent,c:s.dataset.c}));
- const tops=[
-  {nome:'Branca',c:'#f4f2ee',tipo:'Quartzo / compacto'},{nome:'Pedra bege',c:'#d6c8ae',tipo:'Pedra natural / mármore'},
-  {nome:'Cinza escuro',c:'#4b5059',tipo:'Quartzo / compacto'},{nome:'Preta',c:'#1d1e22',tipo:'Quartzo / compacto'}];
- const sel={w:0,c:0,t:0};
- const wImg=$('#wood-img'),txt=$('#cfg-text');
- const mkBtn=(box,key,i,label,paint)=>{const b=document.createElement('button');b.type='button';b.className='opt';b.setAttribute('aria-pressed',i===0);
-  const s=document.createElement('i');paint(s);const l=document.createElement('span');l.textContent=label;b.append(s,l);
-  b.onclick=()=>{sel[key]=i;$$('.opt',box).forEach((x,k)=>x.setAttribute('aria-pressed',k===i));apply(key)};box.append(b)};
- woods.forEach((w,i)=>mkBtn($('#o-wood'),'w',i,w.nome,s=>{s.style.backgroundImage=`url(${w.img})`}));
- cores.forEach((c,i)=>mkBtn($('#o-color'),'c',i,c.curto,s=>{s.style.background=c.c;s.classList.add('flat')}));
- tops.forEach((t,i)=>mkBtn($('#o-top'),'t',i,t.nome,s=>{s.style.background=t.c;s.classList.add('flat')}));
- function apply(key){
-  const w=woods[sel.w],c=cores[sel.c],t=tops[sel.t];
-  view.style.setProperty('--cfg-c',c.c);view.style.setProperty('--cfg-t',t.c);
-  wImg.setAttribute('href',w.img);
-  const low=$('.low',view);low.classList.remove('pop');void low.getBoundingClientRect();if(key==='w')low.classList.add('pop');
-  txt.textContent=`${w.nome} · ${c.curto} · Bancada ${t.nome.toLowerCase()}`};
- apply();
- $('#cfg-go').onclick=()=>{
-  const f=$('form[data-tipo=orcamento]');if(!f)return;
-  const w=woods[sel.w],c=cores[sel.c],t=tops[sel.t];
-  $$('input[name=trabalho]',f).forEach(x=>{if(x.value==='Cozinha')x.checked=true});
-  f.elements.cor_principal.value=c.c;
-  f.elements.acabamento.value='Misto (lacado + madeira)';
-  f.elements.bancada.value=t.tipo;
-  f.elements.cores_descricao.value=`Armários de cima: ${c.nome}; móveis de baixo: madeira ${w.nome}; bancada ${t.nome.toLowerCase()}`;
-  toast('✔ A sua escolha foi adicionada ao pedido');
-  setTimeout(()=>$('#orcamento').scrollIntoView({behavior:'smooth'}),700)};
-})();
-
 // ===== v8: horário de atendimento (hora de Lisboa) =====
 (()=>{
  const el=$('#open-now');if(!el)return;

@@ -1,0 +1,6 @@
+[2026-11-02T23:25:21.563Z] Site: http://localhost:3000  |  Painel: http://localhost:3000/painel/
+[2026-11-02T23:25:27.544Z] [e3330fbd7d] ACESSO NEGADO /api/eu
+[2026-11-02T23:25:28.755Z] [e3330fbd7d] LOGIN falhado
+[2026-11-02T23:25:29.273Z] [e3330fbd7d] LOGIN falhado
+[2026-11-02T23:25:34.862Z] [e3330fbd7d] LOGIN falhado
+[2026-11-02T23:25:41.985Z] [e3330fbd7d] LOGIN ok: dono (dono)
