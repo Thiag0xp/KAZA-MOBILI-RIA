@@ -8,7 +8,7 @@ const { log } = require('./util');
 const sha = (s) => crypto.createHash('sha256').update(String(s)).digest();
 
 function loadUsers() {
-  const users = cfg.USERS.map((u) => ({ ...u, hUser: sha(u.user), hPass: sha(u.pass) }));
+  const users = cfg.USERS.map((u) => ({ ...u, hUser: sha(u.user.toLowerCase()), hPass: sha(u.pass) }));
 
   // Sem senha do dono no .env: gera uma forte no 1.º arranque.
   if (!users.some((u) => u.role === 'dono')) {
@@ -19,7 +19,7 @@ function loadUsers() {
       fs.writeFileSync(cfg.file.senhaGerada, pass, { mode: 0o600 });
       console.log(`\n⚠ Senha do dono não definida. Gerada para "${cfg.DONO_USER_PADRAO}": ${pass}\n  (guardada em dados/.painel-pass)\n`);
     }
-    users.push({ user: cfg.DONO_USER_PADRAO, pass, role: 'dono', hUser: sha(cfg.DONO_USER_PADRAO), hPass: sha(pass) });
+    users.push({ user: cfg.DONO_USER_PADRAO, pass, role: 'dono', hUser: sha(cfg.DONO_USER_PADRAO.toLowerCase()), hPass: sha(pass) });
   }
 
   if (cfg.HTTPS) {
@@ -33,7 +33,7 @@ const USERS = loadUsers();
 
 /** Devolve o utilizador se as credenciais estiverem certas (tempo constante, sem curto-circuito). */
 function checkLogin(user, pass) {
-  const hu = sha(user), hp = sha(pass);
+  const hu = sha(String(user).trim().toLowerCase()), hp = sha(String(pass).trim());
   let found = null;
   for (const u of USERS) {
     const ok = crypto.timingSafeEqual(hu, u.hUser) & crypto.timingSafeEqual(hp, u.hPass);

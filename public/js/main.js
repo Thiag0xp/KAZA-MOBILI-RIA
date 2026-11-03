@@ -82,3 +82,6 @@ $$('.sw').forEach(b=>b.onclick=()=>{const f=$('form[data-tipo=orcamento]');if(!f
   const q=n===0?'hoje':n===1?'amanhã':NOMES[(d+n)%7];
   el.className='open-now off';el.textContent=`Fechado agora · voltamos ${q} às ${ABRE}h`};
  render();setInterval(render,60000)})();
+
+// modo de diagnóstico: abra o site com ?debug no fim do endereço para ver erros no ecrã
+if(/[?&]debug/.test(location.search)){const bx=document.createElement('pre');bx.style.cssText='position:fixed;left:8px;right:8px;top:8px;z-index:9999;max-height:40vh;overflow:auto;margin:0;padding:10px;background:#a8281f;color:#fff;font:12px/1.4 monospace;white-space:pre-wrap;display:none';document.body.append(bx);const sh=m=>{bx.style.display='block';bx.textContent+=m+'\n'};addEventListener('error',e=>sh('Erro: '+e.message+' ('+(e.filename||'').split('/').pop()+':'+e.lineno+')'));addEventListener('unhandledrejection',e=>sh('Promessa: '+(e.reason&&(e.reason.message||e.reason.erro)||e.reason)))}

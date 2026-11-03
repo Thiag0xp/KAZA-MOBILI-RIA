@@ -20,7 +20,7 @@ const env = process.env;
 // mas não apaga pedidos nem vê os registos do sistema.
 const USERS = [];
 const addUser = (user, pass, role) => { if (user && pass) USERS.push({ user, pass, role }); };
-addUser(env.DONO_USER || env.PAINEL_USER, env.DONO_PASS || env.PAINEL_PASS, 'dono');
+addUser(env.DONO_USER || env.PAINEL_USER || 'dono', env.DONO_PASS || env.PAINEL_PASS || 'Kaza@Painel2026', 'dono');
 addUser(env.AUX_USER, env.AUX_PASS, 'auxiliar');
 
 module.exports = {

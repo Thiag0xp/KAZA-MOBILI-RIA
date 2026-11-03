@@ -236,3 +236,8 @@ input:focus, select:focus, textarea:focus { outline: 0; border-color: var(--gold
 /* 10 · acessibilidade */
 :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* ver senha */
+.pass { position: relative; display: block; }
+.pass input { padding-right: 76px; }
+.pass button { position: absolute; top: 50%; right: 8px; transform: translateY(-50%); min-height: 34px; padding: 0 14px; border: 0; border-radius: 999px; background: #eef0f5; color: var(--navy); font-weight: 700; font-size: .82rem; }

@@ -40,7 +40,8 @@ async function api(url, body) {
     body: body ? JSON.stringify(body) : undefined,
   });
   if (res.status === 401 && url !== '/api/login') throw { sessao: true };
-  const data = await res.json();
+  let data;
+  try { data = await res.json(); } catch { throw { erro: `O servidor respondeu com erro ${res.status}.` }; }
   if (!res.ok) throw data;
   return data;
 }
@@ -90,7 +91,8 @@ $('#login-form').addEventListener('submit', async (e) => {
     await api('/api/login', { usuario: $('#login-user').value, senha: $('#login-pass').value });
     $('#login-pass').value = '';
     load();
-  } catch (x) { err.textContent = x.erro || 'Não foi possível entrar.'; }
+
+  } catch (x) { err.textContent = x.erro || (x instanceof TypeError ? 'Sem ligação ao servidor. Ele está ligado? (npm start)' : 'Não foi possível entrar.'); console.error('login:', x); }
 });
 
 $('#btn-logout').addEventListener('click', async () => { await api('/api/logout', {}).catch(() => {}); closeDrawer(); load(); });
@@ -302,5 +304,17 @@ $('#btn-logs').addEventListener('click', async () => {
       <pre class="logs">${esc(logs.join('\n') || 'Sem registos.')}</pre>`);
   } catch (x) { handleError(x); }
 });
+
+// ver a senha enquanto escreve
+$('#toggle-pass').addEventListener('click', (e) => {
+  const i = $('#login-pass'), v = i.type === 'password';
+  i.type = v ? 'text' : 'password';
+  e.currentTarget.textContent = v ? 'Ocultar' : 'Ver';
+  e.currentTarget.setAttribute('aria-pressed', v);
+});
+
+// qualquer erro inesperado aparece no ecrã (e na consola)
+addEventListener('error', (e) => toast('Erro: ' + e.message, true));
+addEventListener('unhandledrejection', (e) => { if (!(e.reason && e.reason.sessao)) toast('Erro: ' + ((e.reason && (e.reason.erro || e.reason.message)) || 'desconhecido'), true); });
 
 load();

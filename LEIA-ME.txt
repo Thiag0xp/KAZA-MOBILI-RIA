@@ -6,7 +6,9 @@ NO SEU PC
   npm start
   Site:   http://localhost:3000
   Painel: http://localhost:3000/painel/
-  Login:  definido no ficheiro .env
+  Login:  definido no ficheiro .env (já vem preenchido)
+          dono / Kaza@Painel2026      auxiliar / Kaza@Aux2026
+          Diagnóstico no site: abra com ?debug no fim do endereço
           dono      (DONO_USER / DONO_PASS)  -> acesso total
           auxiliar  (AUX_USER / AUX_PASS)    -> vê pedidos e atualiza estados;
                                                 não apaga nem vê os registos
